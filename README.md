@@ -1,4 +1,4 @@
-# opt-uncertainty
+# Uncertainty in Optimization
 6.881 Final Project
 
 ## Setup
