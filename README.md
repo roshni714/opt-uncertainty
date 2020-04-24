@@ -16,6 +16,6 @@ pip install -e .
 ## Test
 ```
 cd test
-python test_package_import
+python test_package_import.py
 # Passed!
 ```
