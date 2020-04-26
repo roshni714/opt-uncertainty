@@ -11,14 +11,14 @@ dataset = "MNIST"
 
 model = opt_uncertainty.models.get_basic_model(input_shape=x_train.shape[1:])
 loss_function = edl.losses.Dirichlet_SOS
-optimizer = tf.optimizers.Adam(learning_rate=5e-5)
+optimizer = tf.optimizers.Adam(5e-5)
 epochs = 50
 
 checkpoint_path = os.path.join("save", dataset, "cp-{iteration:04d}.h5")
 
 # training loop
 batch_size = 64
-for i in range(10000):
+for i in range(30000):
     idx = np.random.choice(x_train.shape[0], batch_size)
     x_input_batch = tf.gather(x_train, idx)
 
@@ -30,7 +30,7 @@ for i in range(10000):
     grads = tape.gradient(loss, model.variables) #compute gradient
     optimizer.apply_gradients(zip(grads, model.variables))
     if i % 50 == 0:
-        print("Training Loss: {}".format(loss.numpy().mean()))
+        print("[{}/30000]: {}".format(i, loss.numpy().mean()))
 
-    if i % 1000 == 0:
+    if i % 5000 == 0:
         model.save(checkpoint_path.format(iteration=i))

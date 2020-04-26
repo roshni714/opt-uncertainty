@@ -1,4 +1,7 @@
 import tensorflow as tf
+import math
+import scipy.ndimage as nd
+import numpy as np
 
 def get_dataset(dataset):
     """
@@ -14,8 +17,8 @@ def get_dataset(dataset):
     elif dataset.lower() == "cifar10":
         (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar.load_data()
 
-    x_train, x_test = x_train/255., x_test/255.
-    x_train, x_test = tf.expand_dims(x_train, -1), tf.expand_dims(x_test, -1)
+    x_train  = tf.cast(tf.expand_dims(x_train, -1), tf.float32)/255.
+    x_test  = tf.cast(tf.expand_dims(x_test, -1), tf.float32)/255.
     y_train = tf.one_hot(y_train, 10)
     y_test = tf.one_hot(y_test, 10)
 
@@ -25,8 +28,22 @@ def get_dataset(dataset):
 def apply_corruption_to_dataset(imgs, corruption_type, corruption_level):
 
     if corruption_type == "rotation":
-        corr_imgs = tf.contrib.image.rotate(imgs,  corruption_level * math.pi/180., interpolation='BILINEAR')
+        angles = [corruption_level * math.pi/180. for i in range(imgs.shape[0])]
+        corr_imgs = rotate_imgs(imgs, angles)
     elif corruption_type == "brightness":
         corr_imgs = tf.image.adjust_brightness(imgs, corruption_level)
 
     return corr_imgs
+
+
+def rotate_imgs(imgs, angles):
+    print("Rotating imgs...")
+    test_imgs = []
+    for i in range(len(imgs)):
+        s = imgs[i].shape
+        nimg = nd.rotate(imgs[i].numpy().reshape(s[0], s[1]), angles[i], reshape=False).reshape(s[0], s[1], s[2])
+        nimg = np.clip(a=nimg, a_min=0, a_max=1)
+        test_imgs.append(nimg)
+    return np.array(test_imgs)
+
+
