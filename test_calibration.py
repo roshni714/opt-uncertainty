@@ -1,19 +1,24 @@
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+import glob
 
-from data import get_dataset, apply_corruption_to_dataset
-from model import get_basic_model
-import edl
+import opt_uncertainty
+from opt_uncertainty import evidential as edl
 
-#Load model
-checkpoint path = "models/MNIST/cp-10000.ckpt" 
-model = get_basic_model()
-model.load(checkpoint_path)
+# Load model
+checkpoint_path = max(glob.glob('save/MNIST/*.h5'), key=os.path.getmtime) # get the last save model
+# checkpoint_path = "save/MNIST/cp-10000.h5" # get a specific model
+
+model = tf.keras.models.load_model(checkpoint_path, custom_objects={
+    'DenseDirichlet':edl.layers.DenseDirichlet,
+    'DenseSigmoid':edl.layers.DenseSigmoid,
+})
 
 # Specify dataset, type of corruption, and corruption range
 dataset = "MNIST"
-(x_train, y_train), (x_test, y_test) = get_dataset(dataset)
+(x_train, y_train), (x_test, y_test) = opt_uncertainty.data.get_dataset(dataset)
 corruption_type = "rotation"
 corruption_range = [-360, 360]
 #corruption_type = "brightness"
@@ -24,7 +29,7 @@ corruption_amounts = np.linspace(corruption_range[0], corruption_range[1], 20)
 # Get the mean uncertainty+accuracy  at a particular corruption level
 stats = {"accuracy": [], "uncertainty": [], "corruption_level": list(corruption_amounts)}
 for i in corruption_amounts:
-    corr_x_test = apply_corruption_to_dataset(x_test, corruption_type, i) 
+    corr_x_test = opt_uncertainty.data.apply_corruption_to_dataset(x_test, corruption_type, i)
 
     outputs  = model(corr_x_test)
     alpha, probs = tf.split(outputs, 2, axis=-1)
@@ -40,5 +45,5 @@ for i in corruption_amounts:
     stats["uncertainty"].append(u)
 
 
-#TODO plot corruption level vs. uncertainty, accuracy to visualize whether uncertainty is correlated with accuracy 
 
+#TODO plot corruption level vs. uncertainty, accuracy to visualize whether uncertainty is correlated with accuracy

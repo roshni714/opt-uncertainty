@@ -18,6 +18,10 @@ class DenseSigmoid(Layer):
     def compute_output_shape(self, input_shape):
         return (input_shape[0], self.units)
 
+    def get_config(self):
+        return {'units': self.units}
+
+
 
 class DenseDirichlet(Layer):
     def __init__(self, units):
@@ -34,3 +38,6 @@ class DenseDirichlet(Layer):
 
     def compute_output_shape(self, input_shape):
         return (input_shape[0], 2*self.units)
+
+    def get_config(self):
+        return {'units': self.units}

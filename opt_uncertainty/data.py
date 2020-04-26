@@ -1,4 +1,4 @@
-import tensorflow.tf
+import tensorflow as tf
 
 def get_dataset(dataset):
     """
@@ -9,12 +9,13 @@ def get_dataset(dataset):
         dataset - name of dataset
         dictionary - dictionary specifying amount of corruption
     """
-    if dataset == "MNIST":
+    if dataset.lower() == "mnist":
         (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
-    elif dataset== "CIFAR10":
+    elif dataset.lower() == "cifar10":
         (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar.load_data()
 
     x_train, x_test = x_train/255., x_test/255.
+    x_train, x_test = tf.expand_dims(x_train, -1), tf.expand_dims(x_test, -1)
     y_train = tf.one_hot(y_train, 10)
     y_test = tf.one_hot(y_test, 10)
 

@@ -2,23 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
+import opt_uncertainty
 from opt_uncertainty import evidential as edl
 
 
-(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
-x_train = tf.cast(tf.expand_dims(x_train, -1), tf.float32)/255.
-x_test = tf.cast(tf.expand_dims(x_test, -1), tf.float32)/255.
-y_train = tf.one_hot(y_train, 10)
-y_test = tf.one_hot(y_test, 10)
-
-model = tf.keras.models.Sequential([
-    tf.keras.layers.Conv2D(32, 5, 2, 'valid', activation='relu'),
-    tf.keras.layers.Conv2D(64, 3, 2, 'valid', activation='relu'),
-    tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(128, activation='relu'),
-    tf.keras.layers.Dense(64, activation='relu'),
-    edl.layers.DenseDirichlet(10)
-])
+(x_train, y_train), (x_test, y_test) = opt_uncertainty.data.get_dataset("mnist")
+model = opt_uncertainty.models.get_basic_model(x_train.shape[1:])
 
 # loss_function = edl.losses.Softmax_CE
 loss_function = edl.losses.Dirichlet_SOS
