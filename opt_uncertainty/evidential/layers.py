@@ -6,7 +6,7 @@ from tensorflow.keras.models import Sequential
 
 class DenseSoftmax(Layer):
     def __init__(self, units):
-        super(DenseSigmoid, self).__init__()
+        super(DenseSoftmax, self).__init__()
         self.units = int(units)
         self.dense = Dense(int(units))
 
