@@ -18,7 +18,7 @@ checkpoint_path = os.path.join("save", dataset, "cp-{iteration:04d}.h5")
 
 # training loop
 batch_size = 64
-for i in range(30000):
+for i in range(100000):
     idx = np.random.choice(x_train.shape[0], batch_size)
     x_input_batch = tf.gather(x_train, idx)
 
@@ -32,5 +32,13 @@ for i in range(30000):
     if i % 50 == 0:
         print("[{}/30000]: {}".format(i, loss.numpy().mean()))
 
-    if i % 5000 == 0:
-        model.save(checkpoint_path.format(iteration=i))
+    if i % 1000 == 0:
+       outputs  = model(x_test)
+       alpha, probs = tf.split(outputs, 2, axis=-1)
+       y_pred = tf.argmax(probs, axis=1)
+       y_true = tf.argmax(y_test, axis=1)
+       acc = np.mean(y_pred==y_true)
+       print("Test Accuracy [{}/30000]: {}".format(i, acc))
+
+    if i % 10000 == 0:
+       model.save(checkpoint_path.format(iteration=i))

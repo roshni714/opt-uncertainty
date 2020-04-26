@@ -13,17 +13,18 @@ checkpoint_path = max(glob.glob('save/MNIST/*.h5'), key=os.path.getmtime) # get 
 model = tf.keras.models.load_model(checkpoint_path, custom_objects={
     'DenseDirichlet':edl.layers.DenseDirichlet,
     'DenseSigmoid':edl.layers.DenseSigmoid,
-})
+}, compile=False)
+
 
 # Specify dataset, type of corruption, and corruption range
 dataset = "MNIST"
 (x_train, y_train), (x_test, y_test) = opt_uncertainty.data.get_dataset(dataset)
 corruption_type = "rotation"
-corruption_range = [-20, 20]
+corruption_range = [-360, 360]
 #corruption_type = "brightness"
 #corruption_range = [0.001, 2]
 
-corruption_amounts = np.linspace(corruption_range[0], corruption_range[1], 20)
+corruption_amounts = np.linspace(corruption_range[0], corruption_range[1], 40)
 
 # Get the mean uncertainty+accuracy  at a particular corruption level
 stats = {"accuracy": [], "uncertainty": [], "corruption_level": list(corruption_amounts)}
@@ -50,5 +51,6 @@ for i in corruption_amounts:
     print("Corruption: {}, Acc: {}, Uncertainty: {}, Uncertainty Var: {}".format(i, acc, u, u_var))
 
 print(stats)
+
 
 #TODO plot corruption level vs. uncertainty, accuracy to visualize whether uncertainty is correlated with accuracy

@@ -28,7 +28,7 @@ def get_dataset(dataset):
 def apply_corruption_to_dataset(imgs, corruption_type, corruption_level):
 
     if corruption_type == "rotation":
-        angles = [corruption_level * math.pi/180. for i in range(imgs.shape[0])]
+        angles = [corruption_level for i in range(imgs.shape[0])]
         corr_imgs = rotate_imgs(imgs, angles)
     elif corruption_type == "brightness":
         corr_imgs = tf.image.adjust_brightness(imgs, corruption_level)
