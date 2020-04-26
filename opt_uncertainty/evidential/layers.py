@@ -4,7 +4,7 @@ from tensorflow.keras.models import Sequential
 
 
 
-class DenseSigmoid(Layer):
+class DenseSoftmax(Layer):
     def __init__(self, units):
         super(DenseSigmoid, self).__init__()
         self.units = int(units)
@@ -12,11 +12,11 @@ class DenseSigmoid(Layer):
 
     def call(self, x):
         logits = self.dense(x)
-        prob = tf.nn.sigmoid(logits)
-        return [logits, prob]
+        prob = tf.nn.softmax(logits)
+        return tf.concat([logits, prob], axis=-1)
 
     def compute_output_shape(self, input_shape):
-        return (input_shape[0], self.units)
+        return (input_shape[0], 2*self.units)
 
     def get_config(self):
         return {'units': self.units}

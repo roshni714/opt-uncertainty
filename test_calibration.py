@@ -11,8 +11,8 @@ from opt_uncertainty import evidential as edl
 checkpoint_path = max(glob.glob('save/MNIST/*.h5'), key=os.path.getmtime) # get the last save model
 
 model = tf.keras.models.load_model(checkpoint_path, custom_objects={
-    'DenseDirichlet':edl.layers.DenseDirichlet,
-    'DenseSigmoid':edl.layers.DenseSigmoid,
+    'DenseDirichlet': edl.layers.DenseDirichlet,
+    'DenseSoftmax': edl.layers.DenseSoftmax,
 }, compile=False)
 
 
@@ -36,10 +36,11 @@ for i in corruption_amounts:
     u = np.mean(float(alpha.shape.as_list()[1]) / tf.reduce_sum(alpha, axis=1, keepdims=True))
     u_var = np.var(float(alpha.shape.as_list()[1]) / tf.reduce_sum(alpha, axis=1, keepdims=True))
 
-    
+
     #uncertainty
 
     #TODO: should also record std dev of uncertainty
+    import pdb; pdb.set_trace()
     y_pred = tf.argmax(probs, axis=1)
     y_true = tf.argmax(y_test, axis=1)
 

@@ -45,5 +45,3 @@ def rotate_imgs(imgs, angles):
         nimg = np.clip(a=nimg, a_min=0, a_max=1)
         test_imgs.append(nimg)
     return np.array(test_imgs)
-
-
