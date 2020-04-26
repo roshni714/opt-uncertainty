@@ -28,7 +28,7 @@ def Dirichlet_SOS(y, alpha):
     # prob = alpha/tf.reduce_sum(alpha, 1, keepdims=True)
     alp = evidence * (1-y) + 1
 
-    # C = tf.reduce_mean(alp, axis=1)
+    # C = tf.reduce_mean(alp, axis=1, keepdims=True)
     C =  1 * KL(alp)
 
     return tf.reduce_mean(A + B + C)
