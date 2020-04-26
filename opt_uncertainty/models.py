@@ -11,7 +11,7 @@ def get_basic_model(input_shape, method="evidence"):
         tf.keras.layers.Dense(128, activation='relu'),
         tf.keras.layers.Dense(64, activation='relu'),
     ])
-    if method == "vanilla":
+    if method == "softmax":
         model.add(edl.layers.DenseSoftmax(10))
     elif method == "evidence":
         model.add(edl.layers.DenseDirichlet(10))

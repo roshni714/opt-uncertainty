@@ -7,10 +7,11 @@ import opt_uncertainty
 from opt_uncertainty import evidential as edl
 
 dataset = "MNIST"
+train_method = "evidence"
 (x_train, y_train), (x_test, y_test) = opt_uncertainty.data.get_dataset(dataset)
 
-model = opt_uncertainty.models.get_basic_model(input_shape=x_train.shape[1:], method="vanilla")
-loss_function = edl.losses.Dirichlet_SOS
+model = opt_uncertainty.models.get_basic_model(input_shape=x_train.shape[1:], method=train_method)
+loss_function = edl.losses.Dirichlet_SOS if train_method == "evidence" else edl.losses.Softmax_CE
 optimizer = tf.optimizers.Adam(1e-4)
 epochs = 50
 
