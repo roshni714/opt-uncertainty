@@ -12,8 +12,10 @@ def get_basic_model(input_shape, method="evidence"):
         tf.keras.layers.Dense(64, activation='relu'),
     ])
     if method == "softmax":
+        print("softmax model")
         model.add(edl.layers.DenseSoftmax(10))
-    elif method == "evidence":
+    elif method == "evidence" or method == "evidence_regularized":
+        print("evidence model")
         model.add(edl.layers.DenseDirichlet(10))
     else:
         raise ValueError("unrecognized output method: {}".format(method))
