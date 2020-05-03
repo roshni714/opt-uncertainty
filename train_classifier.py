@@ -41,7 +41,7 @@ def train_step(x, y, v=1, epsilon=0.002):
 
     return loss, v
 
-def make_training_plot(vs, losses, accs, iteration):
+def make_training_plot(vs, losses, accs, train_method, iteration):
     fig = plt.figure(figsize=(15,5))
     ax1 = fig.add_subplot(131)
     ax2 = fig.add_subplot(132)
@@ -63,7 +63,7 @@ def make_training_plot(vs, losses, accs, iteration):
     ax2.set_xlabel("Iteration")
     ax3.set_xlabel("Iteration")
 
-    plt.savefig("figs/gda/training_{}.pdf".format(i))
+    plt.savefig("figs/training/{}_{}.pdf".format(train_method,i))
 
 
 # training loop
@@ -99,6 +99,6 @@ for i in range(num_iters):
 
     if i % 10000 == 0:
        model.save(checkpoint_path.format(iteration=i))
-       make_training_plot(vs, losses, accs, iteration=i)
+       make_training_plot(vs, losses, accs, train_method, iteration=i)
 
 
