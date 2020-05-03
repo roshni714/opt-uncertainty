@@ -3,7 +3,18 @@ import math
 import scipy.ndimage as nd
 import numpy as np
 
-def get_dataset(dataset):
+def randomly_invert(batch):
+    new_batch = []
+    for i in range(len(batch)):
+        if i % 2 == 0:
+            new_batch.append(-batch[i] + 1)
+        else:
+            new_batch.append(batch[i])
+    return np.array(new_batch)
+
+
+
+def get_dataset(dataset, inversion_type=None, corruption_type=None, corruption_level=None):
     """
     Generates train and test dataset with specified corruption applied to the
     test dataset.
@@ -17,8 +28,31 @@ def get_dataset(dataset):
     elif dataset.lower() == "cifar10":
         (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar.load_data()
 
-    x_train  = tf.cast(tf.expand_dims(x_train, -1), tf.float32)/255.
-    x_test  = tf.cast(tf.expand_dims(x_test, -1), tf.float32)/255.
+    x_train  = (tf.cast(tf.expand_dims(x_train, -1), tf.float32)/255.)
+    x_test  = (tf.cast(tf.expand_dims(x_test, -1), tf.float32)/255.)
+
+    if inversion_type == "all":
+         x_train = -x_train +1
+         x_test = -x_test + 1
+#    elif inversion_type == "half":
+#        x_train = randomly_invert(x_train)
+#        x_test = randomly_invert(x_train)
+
+        
+    if corruption_type:
+        x_train = apply_corruption_to_dataset(x_train, corruption_type, corruption_level)
+        x_test = apply_corruption_to_dataset(x_test, corruption_type, corruption_level)
+
+    #normalize data
+#    if dataset.lower() == "mnist":
+#         if inversion_type == "all":
+#             x_train = (x_train - 0.8693)/0.3081
+#             x_test = (x_test - 0.8693)/0.3081
+#             print(tf.reduce_mean(x_train))
+#         else:
+#             x_train = (x_train -0.1307)/0.3081
+#             x_test = (x_test -0.1307)/0.3081
+
     y_train = tf.one_hot(y_train, 10)
     y_test = tf.one_hot(y_test, 10)
 
@@ -32,7 +66,7 @@ def apply_corruption_to_dataset(imgs, corruption_type, corruption_level):
         corr_imgs = rotate_imgs(imgs, angles)
     elif corruption_type == "brightness":
         corr_imgs = tf.image.adjust_brightness(imgs, corruption_level)
-
+        corr_imgs = tf.clip_by_value(corr_imgs, 0, 1)
     return corr_imgs
 
 
