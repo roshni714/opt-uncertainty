@@ -95,7 +95,7 @@ for i in range(num_iters):
        y_true = tf.argmax(y_test, axis=1)
        acc = np.mean(y_pred==y_true)
        accs.append((i, acc))
-       print("Test Accuracy [{}/100000]: {}".format(i, acc))
+       print("Test Accuracy [{}/{}]: {}".format(i, num_iters, acc))
 
     if i % 10000 == 0:
        model.save(checkpoint_path.format(iteration=i))
