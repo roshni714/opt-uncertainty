@@ -6,14 +6,15 @@ def Dirichlet_Regularized_SOS(y, alpha, v, epsilon):
         beta = tf.ones((1, alpha.shape[1]), dtype=tf.float32)
         S_alpha = tf.reduce_sum(alpha, axis=1, keepdims=True)
         S_beta = tf.reduce_sum(beta, axis=1, keepdims=True)
-        lnB = tf.math.lgamma(S_alpha) - tf.reduce_sum(tf.math.lgamma(alpha),axis=1,keepdims=True)
+        lnB = tf.math.lgamma(S_alpha) - tf.reduce_sum(tf.math.lgamma(alpha),axis=1,keepdims=True) 
         lnB_uni = tf.reduce_sum(tf.math.lgamma(beta), axis=1, keepdims=True) - tf.math.lgamma(S_beta)
 
         dg0 = tf.math.digamma(S_alpha)
         dg1 = tf.math.digamma(alpha)
 
         kl = tf.reduce_sum((alpha - beta) * (dg1-dg0), axis=1, keepdims=True) + lnB + lnB_uni
-        return kl
+
+        return kl 
 
     S = tf.reduce_sum(alpha, axis=1, keepdims=True)
     evidence = alpha - 1
@@ -28,9 +29,10 @@ def Dirichlet_Regularized_SOS(y, alpha, v, epsilon):
     alp = evidence * (1-y) + 1
 
     # C = tf.reduce_mean(alp, axis=1)
-    C =  v * (KL(alp) - epsilon)
+    loss_reg = KL(alp)
+    C =  v * (loss_reg - epsilon)
 
-    return tf.reduce_mean(A + B + C), C
+    return tf.reduce_mean(A + B + C), tf.reduce_mean(loss_reg)
 
 
 def Dirichlet_SOS(y, alpha):

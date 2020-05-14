@@ -31,6 +31,7 @@ class DenseDirichlet(Layer):
 
     def call(self, x):
         output = self.dense(x)
+        output = tf.clip_by_value(output, -10000, 100)
         evidence = tf.exp(output)
         alpha = evidence + 1
         prob = alpha / tf.reduce_sum(alpha, 1, keepdims=True)

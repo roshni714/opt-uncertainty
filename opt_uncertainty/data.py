@@ -2,6 +2,9 @@ import tensorflow as tf
 import math
 import scipy.ndimage as nd
 import numpy as np
+import sklearn.datasets as datasets
+
+np.random.seed(0)
 
 def randomly_invert(batch):
     new_batch = []
@@ -12,16 +15,23 @@ def randomly_invert(batch):
             new_batch.append(batch[i])
     return np.array(new_batch)
 
+def get_toy_dataset(centers):
+
+    X, y = datasets.make_moons(n_samples=6000, shuffle=True, noise=0.25, random_state=0)
+
+    x_train, y_train = tf.cast(X[:5000], tf.float32), tf.one_hot(y[:5000], 2)
+    x_test, y_test = tf.cast(X[5000:], tf.float32), tf.one_hot(y[5000:], 2)
+
+    return (x_train, y_train), (x_test, y_test)
 
 
-def get_dataset(dataset, inversion_type=None, corruption_type=None, corruption_level=None):
+def get_dataset(dataset, corruption_type=None, corruption_level=None):
     """
     Generates train and test dataset with specified corruption applied to the
     test dataset.
 
     Parameters:
         dataset - name of dataset
-        dictionary - dictionary specifying amount of corruption
     """
     if dataset.lower() == "mnist":
         (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
@@ -31,16 +41,8 @@ def get_dataset(dataset, inversion_type=None, corruption_type=None, corruption_l
     x_train  = (tf.cast(tf.expand_dims(x_train, -1), tf.float32)/255.)
     x_test  = (tf.cast(tf.expand_dims(x_test, -1), tf.float32)/255.)
 
-    if inversion_type == "all":
-         x_train = -x_train +1
-         x_test = -x_test + 1
-#    elif inversion_type == "half":
-#        x_train = randomly_invert(x_train)
-#        x_test = randomly_invert(x_train)
-
         
     if corruption_type:
-        x_train = apply_corruption_to_dataset(x_train, corruption_type, corruption_level)
         x_test = apply_corruption_to_dataset(x_test, corruption_type, corruption_level)
 
     #normalize data
@@ -67,8 +69,20 @@ def apply_corruption_to_dataset(imgs, corruption_type, corruption_level):
     elif corruption_type == "brightness":
         corr_imgs = tf.image.adjust_brightness(imgs, corruption_level)
         corr_imgs = tf.clip_by_value(corr_imgs, 0, 1)
+    elif corruption_type == "blur":
+        blurs = [corruption_level for i in range(imgs.shape[0])]
+        corr_imgs = blur_imgs(imgs, blurs)
     return corr_imgs
 
+
+def blur_imgs(imgs, blurs):
+    test_imgs = []
+    for i in range(len(imgs)):
+        s = imgs[i].shape
+        nimg = nd.gaussian_filter(imgs[i].numpy().reshape(s[0], s[1]), blurs[i]).reshape(s[0], s[1], s[2])
+        nimg = np.clip(a=nimg, a_min=0, a_max=1)
+        test_imgs.append(nimg)
+    return np.array(test_imgs)
 
 def rotate_imgs(imgs, angles):
     print("Rotating imgs...")
